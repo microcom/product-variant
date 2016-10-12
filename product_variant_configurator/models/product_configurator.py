@@ -108,6 +108,7 @@ class ProductConfigurator(models.AbstractModel):
                 product = self.env['product.product'].with_context(
                     lang=self.partner_id.lang).browse(self.product_id.id)
             self.product_attribute_ids = [(0, 0, x) for x in attribute_list]
+            self.product_tmpl_id = product.product_tmpl_id.id
             self.name = self._get_product_description(
                 product.product_tmpl_id, product, product.attribute_value_ids)
 
@@ -135,6 +136,7 @@ class ProductConfigurator(models.AbstractModel):
                 val['owner_id'] = self.id
             attr_values = [(0, 0, values) for values in attr_values_dict]
             res['product_attribute_ids'] = attr_values
+            res['product_tmpl_id'] = product.product_tmpl_id.id
             res['name'] = self._get_product_description(
                 product.product_tmpl_id, product,
                 product.attribute_value_ids)
