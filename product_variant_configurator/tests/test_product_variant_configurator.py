@@ -208,6 +208,20 @@ class TestProductVariantConfigurator(SavepointCase):
             product.product_tmpl_id, product, product.attribute_value_ids),
             'Test product')
 
+    def test_onchange_product_tmpl_id(self):
+        product = self.product_product.create({
+            'name': 'Test product',
+            'product_tmpl_id': self.product_template_yes.id
+        })
+        with self.cr.savepoint(), self.assertRaises(ValidationError):
+            product.product_tmpl_id = self.product_template_no
+
+        product.product_tmpl_id = self.product_template_empty_no
+        res = product.onchange_product_tmpl_id()
+        self.assertEquals(
+            res, {'domain': {'product_id': [
+                ('product_tmpl_id', '=', self.product_template_empty_no.id)]}})
+
     def test_templ_name_search(self):
         res = self.product_template.name_search('Product template 222')
         for r in res:
@@ -245,6 +259,25 @@ class TestProductVariantConfigurator(SavepointCase):
                 })]
             }
             self.product_product.check_configuration_validity(product_vals)
+
+    def test_onchange_product_attribute_ids(self):
+        product = self.product_product.create({
+            'name': 'Test product Check',
+            'product_tmpl_id': self.product_template_yes.id,
+        })
+        product_attribute_vals = {
+            'product_tmpl_id': self.product_template_yes.id,
+            'attribute_id': self.attribute1.id,
+            'value_id': self.value2.id,
+            'owner_model': 'res.partner',
+            'owner_id': int(product.id)
+        }
+        product.product_attribute_ids = [(0, 0, product_attribute_vals)]
+        result = product.onchange_product_attribute_ids()
+        self.assertTrue(
+            ('product_tmpl_id', '=', self.product_template_yes.id)
+            in result['domain']['product_id']
+        )
 
     def test_get_product_attributes_values_dict(self):
         product = self.product_product.create({
