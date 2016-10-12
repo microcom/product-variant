@@ -113,13 +113,15 @@ class ProductConfigurator(models.AbstractModel):
                 product.product_tmpl_id, product, product.attribute_value_ids)
 
     @api.multi
-    def onchange_product_id_product_configurator_old_api(self, product_id,
-                                                         partner_id=None):
+    def onchange_product_id_product_configurator_old_api(
+            self, product_id, partner_id=None):
         """Method to be called in case inherited model use old API on_change.
+
         The returned result has to be merged with current 'value' key in the
         regular on_change method, not with the complete dictionary.
 
         :param product_id: ID of the changed product.
+        :param partner_id: ID of the partner in the model.
         :return: Dictionary with the changed values.
         """
         res = {}
@@ -185,8 +187,9 @@ class ProductConfigurator(models.AbstractModel):
 
     @api.model
     def check_configuration_validity(self, vals):
-        """This method checks that the current selection values are correct
-        according rules. As default, the validity means that all the attributes
+        """The method checks that the current selection values are correct.
+
+        As default, the validity means that all the attributes
         values are set. This can be overridden to set another rules.
 
         :param vals: Dictionary of values that creates the record
@@ -200,10 +203,11 @@ class ProductConfigurator(models.AbstractModel):
 
     @api.multi
     def _create_variant_from_vals(self, vals):
-        """This method creates a product variant extracting the needed values
-        from the values dictionary passed to the ORM methods create/write. It
-        also takes the rest of the values from the associated recordset in self
-        if needed, or raise an ensure_one exception if not provided.
+        """The method creates a product variant extracting the needed values.
+
+        the values dictionary is provided from the ORM methods create/write.
+        It also takes the rest of the values from the associated recordset
+        in self if needed, or raise an ensure_one exception if not provided.
         :param vals: Dictionary of values for the record creation/update.
         :return: The same values dictionary with the ID of the created product
         in it under the key `product_id`.

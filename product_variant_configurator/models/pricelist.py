@@ -126,15 +126,15 @@ class ProductPricelist(models.Model):
                 if price is not False:
                     price += price_extra
                     price_limit = price
-                    price = price * (1.0+(rule.price_discount or 0.0))
+                    price = price * (1.0 + (rule.price_discount or 0.0))
                     if rule.price_round:
                         price = tools.float_round(
                             price, precision_rounding=rule.price_round)
                     price += (rule.price_surcharge or 0.0)
                     if rule.price_min_margin:
-                        price = max(price, price_limit+rule.price_min_margin)
+                        price = max(price, price_limit + rule.price_min_margin)
                     if rule.price_max_margin:
-                        price = min(price, price_limit+rule.price_max_margin)
+                        price = min(price, price_limit + rule.price_max_margin)
                     rule_id = rule.id
                 break
 

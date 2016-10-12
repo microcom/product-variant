@@ -79,8 +79,9 @@ class ProductProduct(models.Model):
 
     @api.constrains('product_tmpl_id', 'attribute_value_ids')
     def _check_configuration_validity(self):
-        """This method checks that the current selection values are correct
-        according rules. As default, the validity means that all the attributes
+        """The method checks that the current selection values are correct.
+
+        As default, the validity means that all the attributes
         values are set. This can be overridden to set another rules.
 
         :raises: exceptions.ValidationError: If the check is not valid.
