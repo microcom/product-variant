@@ -155,10 +155,3 @@ class TestProductPriceList(SavepointCase):
         ).template_price_get(self.ipad_template.id, 1)[self.pricelist.id]
 
         self.assertEqual(price, 500 * 0.9)
-
-    def test_price_rule_get_multi_01(self):
-
-        # Price for ipad product
-        # Must be 400
-        price = self.pricelist.price_get(self.ipad_product.id, 1)[self.pricelist.id]
-        self.assertEqual(price, 500 * 0.8)
