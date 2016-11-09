@@ -64,9 +64,9 @@ class ProductConfigurator(models.AbstractModel):
     @api.onchange('product_tmpl_id')
     def onchange_product_tmpl_id_configurator(self):
         if not self.product_tmpl_id:
+            self.product_id = False
+            self._empty_attributes()
             # no product template: allow any product
-            if not self.product_id:
-                self._empty_attributes()
             return {'domain': {'product_id': []}}
 
         if not self.product_tmpl_id.attribute_line_ids:
@@ -95,6 +95,11 @@ class ProductConfigurator(models.AbstractModel):
 
     @api.onchange('product_attribute_ids')
     def onchange_product_attribute_ids(self):
+        if not self.product_tmpl_id:
+            return {'domain': {'product_id': []}}
+        if not self.product_attribute_ids:
+            domain = [('product_tmpl_id', '=', self.product_tmpl_id.id)]
+            return {'domain': {'product_id': domain}}
         product_obj = self.env['product.product']
         domain, cont = product_obj._build_attributes_domain(
             self.product_tmpl_id, self.product_attribute_ids)
@@ -138,38 +143,6 @@ class ProductConfigurator(models.AbstractModel):
             self._set_product_tmpl_attributes()
         else:
             self._empty_attributes()
-
-    @api.multi
-    def onchange_product_id_product_configurator_old_api(
-            self, product_id, partner_id=None):
-        """Method to be called in case inherited model use old API on_change.
-
-        The returned result has to be merged with current 'value' key in the
-        regular on_change method, not with the complete dictionary.
-
-        :param product_id: ID of the changed product.
-        :param partner_id: ID of the partner in the model.
-        :return: Dictionary with the changed values.
-        """
-        res = {}
-        if product_id:
-            product_obj = self.env['product.product']
-            if partner_id:
-                partner = self.env['res.partner'].browse(partner_id)
-                product_obj = product_obj.with_context(lang=partner.lang)
-            product = product_obj.browse(product_id)
-            attr_values_dict = product._get_product_attributes_values_dict()
-            for val in attr_values_dict:
-                val['product_tmpl_id'] = product.product_tmpl_id.id
-                val['owner_model'] = self._name
-                val['owner_id'] = self.id
-            attr_values = [(0, 0, values) for values in attr_values_dict]
-            res['product_attribute_ids'] = attr_values
-            res['product_tmpl_id'] = product.product_tmpl_id.id
-            res['name'] = self._get_product_description(
-                product.product_tmpl_id, product,
-                product.attribute_value_ids)
-        return res
 
     @api.model
     def _order_attributes(self, template, product_attribute_values):
